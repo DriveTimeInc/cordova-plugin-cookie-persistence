@@ -1,0 +1,12 @@
+{
+  "cordova": {
+    "id": "cookie-persistence",
+    "platforms": [
+      "android",
+      "ios"
+    ]
+  },
+  "license": "MIT",
+  "name": "cordova-plugin-cookie-persistence",
+  "version": "0.0.1"
+}

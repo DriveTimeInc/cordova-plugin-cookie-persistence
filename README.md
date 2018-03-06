@@ -2,6 +2,12 @@
 
 Cordova Plugin that injects saved cookies on app start, and saves cookies on pause.
 
+## Install
+
+```
+cordova plugin add https://github.com/DriveTimeInc/cordova-plugin-cookie-persistence
+```
+
 ## Description
 
 For Android and iOS webviews, cookies will not be persisted across multiple app open/closes. This plugin will save cookies on app exit and restore those cookies on app re-start.

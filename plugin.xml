@@ -1,0 +1,50 @@
+<?xml version='1.0' encoding='utf-8'?>
+<plugin id="cordova-plugin-cookie-persistence"
+        version="0.0.1"
+        xmlns="http://apache.org/cordova/ns/plugins/1.0"
+        xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <name>Cookie and Local storage persistence</name>
+    <description>
+
+    </description>
+    <license>MIT</license>
+    <keywords>drivetime, cookies, save, persistence</keywords>
+    <repo>https://github.com/DriveTimeInc/cordova-plugin-cookie-persistence</repo>
+    <issue>https://github.com/DriveTimeInc/cordova-plugin-cookie-persistence/issues</issue>
+
+    <!-- Required gradle functionality support -->
+    <engine name="cordova-android" version=">=4.1.0" />
+    <!-- Cordova 6.4.0 and iOS 4.3.0 are required for Cocoapods support -->
+    <engine name="cordova" version=">=6.4.0" />
+    <engine name="cordova-ios" version=">=4.3.0" />
+
+
+    <platform name="android">
+        <config-file target="res/xml/config.xml" parent="/*">
+            <feature name="CookiePersistence">
+                <param name="onload" value="true" />
+                <param name="android-package"
+                       value="com.drivetime.mobile.cordova.CookiePersistencePlugin"/>
+            </feature>
+        </config-file>
+
+        <source-file src="src/android/CookiePersistencePlugin.java"
+                     target-dir="src/com/drivetime/mobile/cordova" />
+
+    </platform>
+
+    <!-- <platform name="ios">
+        <config-file target="config.xml" parent="/*">
+            <feature name="CookiePersistence">
+                <param name="ios-package" value="CookiePersistencePlugin" />
+                <param name="onload" value="true" />
+            </feature>
+        </config-file>
+
+        <header-file src="src/ios/CookiePersistencePlugin.h" />
+        <source-file src="src/ios/CookiePersistencePlugin.m" />
+
+        <framework src="AppCenter" type="podspec" spec="" />
+    </platform> -->
+</plugin>
