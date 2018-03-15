@@ -33,18 +33,4 @@
                      target-dir="src/com/drivetime/mobile/cordova" />
 
     </platform>
-
-    <!-- <platform name="ios">
-        <config-file target="config.xml" parent="/*">
-            <feature name="CookiePersistence">
-                <param name="ios-package" value="CookiePersistencePlugin" />
-                <param name="onload" value="true" />
-            </feature>
-        </config-file>
-
-        <header-file src="src/ios/CookiePersistencePlugin.h" />
-        <source-file src="src/ios/CookiePersistencePlugin.m" />
-
-        <framework src="AppCenter" type="podspec" spec="" />
-    </platform> -->
 </plugin>
