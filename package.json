@@ -2,7 +2,8 @@
   "cordova": {
     "id": "cookie-persistence",
     "platforms": [
-      "android"
+      "android",
+      "ios"
     ]
   },
   "license": "MIT",
