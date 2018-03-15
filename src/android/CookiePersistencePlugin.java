@@ -103,7 +103,6 @@ public class CookiePersistencePlugin extends CordovaPlugin {
     }
 
     public boolean overwriteFile(Context context, String filePath, String fileContents) {
-        fileContents = "";
         try {
             FileOutputStream outputStream = context.openFileOutput(filePath, Context.MODE_PRIVATE);
             outputStream.write(fileContents.getBytes());
