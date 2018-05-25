@@ -5,5 +5,6 @@
 
 - (void)pluginInitialize;
 - (void)storeCookies:(CDVInvokedUrlCommand*)command;
+- (void)retrieveCookies:(CDVInvokedUrlCommand*)command;
 
 @end
