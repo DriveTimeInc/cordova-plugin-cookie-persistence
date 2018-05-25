@@ -28,4 +28,4 @@ Cookies are saved to a text file when an app is paused.
 
 To get the cookies out, you can call `window.getCookies()`.
 
-**NOTE** This may be a problem for MOST use cases though. [See PR #4 for more details.](https://github.com/DriveTimeInc/cordova-plugin-cookie-persistence/issues/4)
+**NOTE** This may not be the expected workflows for some use cases though. [See PR #4 for more details.](https://github.com/DriveTimeInc/cordova-plugin-cookie-persistence/issues/4)
