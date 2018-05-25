@@ -22,4 +22,10 @@ The cookies will be stored in a private `.txt` file.
 
 ### iOS
 
-IN PROGRESS: This is still being worked on.
+It is possible that this plugin is not required for cookies on iOS. It appears from very basic testing that when an app is killed the cookies are persisted. It is unknown how long this is for.
+
+Cookies are saved to a text file when an app is paused.
+
+To get the cookies out, you can call `window.getCookies()`.
+
+**NOTE** This may be a problem for MOST use cases though. [See PR #4 for more details.](https://github.com/DriveTimeInc/cordova-plugin-cookie-persistence/issues/4)
