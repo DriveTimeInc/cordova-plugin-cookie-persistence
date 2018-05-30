@@ -4,37 +4,49 @@ var channel = require('cordova/channel');
 
 console.log('CookiePersistencePlugin - JS - Init');
 console.log('CookiePersistencePlugin - JS - Cookies', document.cookie)
-//alert(document.cookie)
-var body = '<h1>'+document.cookie+'=HELLO WORLD</h1>'
-setTimeout(function(){
-  console.log('UPDATE')
-  document.querySelector('body').prepend(body)
-}, 5000)
-
 
 //When this code is run, just get the cookie and place it in the window
 //But we need to notify when complete
 
-function retrieveCookies() {
-  console.log('CookiePersistencePlugin - JS - retrieveCookies');
+function restoreCookies(onSuccess, onError) {
+  fetchCookies(function(cookies) {
+    applyStoredCookiesToDocument(cookies);
+    onSuccess(cookies);
+  }, onError);
+}
 
-  var successCallback = cookies => {
-    console.log('CookiePersistencePlugin - JS - retrieveCookies successCallback called', cookies)
+function fetchCookies(onSuccess, onError) {
+  console.log('CookiePersistencePlugin - JS - restoreCookies');
 
-    document.cookie = cookies;
+  var successCallback = function(cookies) {
+    console.log('CookiePersistencePlugin - JS - restoreCookies successCallback called', cookies)
+    onSuccess(cookies);
   }
 
-  var errorCallback = e => {
-    console.log('CookiePersistencePlugin - JS - retrieveCookies errorCallback called', e)
+  var errorCallback = function(e) {
+    console.log('CookiePersistencePlugin - JS - restoreCookies errorCallback called', e)
+    onError(e);
   }
 
   cordova.exec(successCallback, errorCallback, "CookiePersistence", "retrieveCookies", []);
-
 }
-window.getCookies = retrieveCookies;
 
+window.restoreCookies = restoreCookies;
 
-channel.onPause.subscribe(function () {
+function applyStoredCookiesToDocument(cookies) {
+  if (cookies && cookies.length > 0) {
+    console.log(`applyStoredCookiesToDocument start; cookies = ${cookies}; document.cookie = ${document.cookie}`);
+    cookies
+      .trim(' ')
+      .split(';')
+      .forEach(cookie =>
+        document.cookie = cookie
+      );
+    console.log(`applyStoredCookiesToDocument end; cookies = ${cookies}; document.cookie = ${document.cookie}`);
+  }
+}
+
+function writeCookies() {
   var cookies = document.cookie;
   console.log('CookiePersistencePlugin - JS - Pause', cookies);
 
@@ -47,4 +59,6 @@ channel.onPause.subscribe(function () {
   }
 
   cordova.exec(successCallback, errorCallback, "CookiePersistence", "storeCookies", [cookies]);
-})
+}
+
+channel.onPause.subscribe(writeCookies)
