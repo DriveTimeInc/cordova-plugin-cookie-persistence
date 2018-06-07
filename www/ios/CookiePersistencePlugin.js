@@ -9,18 +9,18 @@ console.log('CookiePersistencePlugin - JS - Cookies', document.cookie)
 //But we need to notify when complete
 
 function restoreCookies(onSuccess, onError) {
-  fetchCookies(function(cookies) {
-    applyStoredCookiesToDocument(cookies);
-    onSuccess(cookies);
+  fetchCookiesAndLocalStorage(function(res) {
+    applyCookiesAndLocalStorageToBrowser(res);
+    onSuccess(res);
   }, onError);
 }
 
-function fetchCookies(onSuccess, onError) {
+function fetchCookiesAndLocalStorage(onSuccess, onError) {
   console.log('CookiePersistencePlugin - JS - restoreCookies');
 
-  var successCallback = function(cookies) {
-    console.log('CookiePersistencePlugin - JS - restoreCookies successCallback called', cookies)
-    onSuccess(cookies);
+  var successCallback = function(res) {
+    console.log('CookiePersistencePlugin - JS - restoreCookies successCallback called', res)
+    onSuccess(res);
   }
 
   var errorCallback = function(e) {
@@ -28,27 +28,47 @@ function fetchCookies(onSuccess, onError) {
     onError(e);
   }
 
-  cordova.exec(successCallback, errorCallback, "CookiePersistence", "retrieveCookies", []);
+  cordova.exec(successCallback, errorCallback, "CookiePersistence", "retrieveStorage", []);
 }
 
 window.restoreCookies = restoreCookies;
 
-function applyStoredCookiesToDocument(cookies) {
+function applyCookiesAndLocalStorageToBrowser(res) {
+  var locStorage = res[1];
+  if (locStorage && locStorage.length > 0) {
+    var keyValuePairs = locStorage
+      .split(';')
+      .filter(function(item) {
+      return item !== "";
+    });
+
+    for (var i = 0; i < keyValuePairs.length; i++) {
+      var pair = keyValuePairs[i].split('=');
+      localStorage.setItem(pair[0], pair[1]);
+    }
+  }
+
+  var cookies = res[0];
   if (cookies && cookies.length > 0) {
-    console.log(`applyStoredCookiesToDocument start; cookies = ${cookies}; document.cookie = ${document.cookie}`);
     cookies
       .trim(' ')
       .split(';')
       .forEach(cookie =>
         document.cookie = cookie
       );
-    console.log(`applyStoredCookiesToDocument end; cookies = ${cookies}; document.cookie = ${document.cookie}`);
   }
 }
 
 function writeCookies() {
   var cookies = document.cookie;
+
+  var localStorageText = "";
+  for (var i = 0; i < localStorage.length; i++) {
+    localStorageText +=  localStorage.key(i) + '=' + localStorage.getItem(localStorage.key(i)) + ';';
+  }
+
   console.log('CookiePersistencePlugin - JS - Pause', cookies);
+  console.log('CookiePersistencePlugin - JS - Pause', localStorageText);
 
   var successCallback = r => {
     console.log('CookiePersistencePlugin - JS - Pause successCallback called', r)
@@ -58,7 +78,7 @@ function writeCookies() {
     console.log('CookiePersistencePlugin - JS - Pause errorCallback called', e)
   }
 
-  cordova.exec(successCallback, errorCallback, "CookiePersistence", "storeCookies", [cookies]);
+  cordova.exec(successCallback, errorCallback, "CookiePersistence", "storeText", [["cookies.txt", cookies], ["localstorage.txt", localStorageText]]);
 }
 
 channel.onPause.subscribe(writeCookies)
