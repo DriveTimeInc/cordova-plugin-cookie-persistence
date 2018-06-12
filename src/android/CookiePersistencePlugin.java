@@ -98,7 +98,7 @@ public class CookiePersistencePlugin extends CordovaPlugin {
             return CookieManager.getInstance().getCookie(url);
         } catch (Exception e) {
             LOG.e(LOG_TAG, "Exception: " + e.getMessage());
-            return null;
+            return "";
         }
     }
 
