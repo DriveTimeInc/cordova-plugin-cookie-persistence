@@ -8,6 +8,7 @@ console.log('CookiePersistencePlugin - JS - Cookies', document.cookie)
 //When this code is run, just get the cookie and place it in the window
 //But we need to notify when complete
 
+// COOKIES & LOCALSTORAGE
 function restoreCookiesAndLocalStorage(onSuccess, onError) {
   console.time("restoreCookies - start");
   fetchCookiesAndLocalStorage(function(res) {
@@ -16,28 +17,12 @@ function restoreCookiesAndLocalStorage(onSuccess, onError) {
   }, onError);
 }
 
-function restoreCookies(onSuccess, onError) {
-  console.time("restoreCookies - start");
-  fetchCookies(function(cookies) {
-    refreshCookies(cookies);
-    onSuccess(cookies);
-  }, onError);
-}
-
-function restoreLocalStorage(onSuccess, onError) {
-  console.time("restoreCookies - start");
-  fetchLocalStorage(function(savedStorage) {
-    refreshLocalStorage(savedStorage);
-    onSuccess(savedStorage);
-  }, onError);
-}
-
 function fetchCookiesAndLocalStorage(onSuccess, onError) {
   console.log('CookiePersistencePlugin - JS - restoreCookies');
 
   var successCallback = function(res) {
-    console.timeEnd("restoreCookies - end");
     console.log('CookiePersistencePlugin - JS - restoreCookies successCallback called', res)
+    console.timeEnd("restoreCookies - end");
     onSuccess(res);
   }
 
@@ -50,46 +35,29 @@ function fetchCookiesAndLocalStorage(onSuccess, onError) {
 }
 
 function applyCookiesAndLocalStorageToBrowser(res) {
-  refreshCookies(res[0]);
-  refreshLocalStorage(res[1]);
+  applyCookiesToBrowser(res[0]);
+  applyLocalStorageToBrowser(res[1]);
 }
 
-function refreshCookies(savedCookies) {
-  if (!savedCookies || savedCookies.length < 1) return;
-  savedCookies
-  .trim(' ')
-  .split(';')
-  .forEach(savedCookie =>
-    document.cookie = savedCookie
-  );
+// COOKIES
+function restoreCookies(onSuccess, onError) {
+  console.time("restoreCookies - start");
+  fetchCookies(function(cookies) {
+    refreshCookies(cookies);
+    onSuccess(cookies);
+  }, onError);
 }
 
-function refreshLocalStorage(savedStorage) {
-  if (!savedStorage || savedStorage.length < 1) return;
-
-  var parsedStorage = {};
-  try {
-    parsedStorage = JSON.parse(savedStorage);
-  } catch(e) {
-    throw e;
-    // come back to this? bubble it up
-  }
-
-  Object.keys(parsedStorage).forEach(function(key) {
-    localStorage.setItem(key, parsedStorage[key]);
-  });
+// LOCALSTORAGE
+function restoreLocalStorage(onSuccess, onError) {
+  console.time("restoreCookies - start");
+  fetchLocalStorage(function(savedStorage) {
+    refreshLocalStorage(savedStorage);
+    onSuccess(savedStorage);
+  }, onError);
 }
 
-function getLocalStorageAsString() {
-
-  var localStorageObj = {}
-  for (var i = 0; i < localStorage.length; i++) {
-    localStorageObj[localStorage.key(i)] = localStorage.getItem(localStorage.key(i));
-  }
-
-  return JSON.stringify(localStorageObj);
-}
-
+// WRITE
 function writeCookies() {
   var cookies = document.cookie;
   console.log('CookiePersistencePlugin - JS - Pause', cookies);
@@ -118,6 +86,42 @@ function writeLocalStorage() {
   }
 
   cordova.exec(successCallback, errorCallback, "CookiePersistence", "storeLocalStorage", [localStorageText]);
+}
+
+// UTILS
+function getLocalStorageAsString() {
+  var localStorageObj = {}
+  for (var i = 0; i < localStorage.length; i++) {
+    localStorageObj[localStorage.key(i)] = localStorage.getItem(localStorage.key(i));
+  }
+
+  return JSON.stringify(localStorageObj);
+}
+
+function applyCookiesToBrowser(savedCookies) {
+  if (!savedCookies || savedCookies.length < 1) return;
+  savedCookies
+  .trim(' ')
+  .split(';')
+  .forEach(savedCookie =>
+    document.cookie = savedCookie
+  );
+}
+
+function applyLocalStorageToBrowser(savedStorage) {
+  if (!savedStorage || savedStorage.length < 1) return;
+
+  var parsedStorage = {};
+  try {
+    parsedStorage = JSON.parse(savedStorage);
+  } catch(e) {
+    throw e;
+    // come back to this? bubble it up
+  }
+
+  Object.keys(parsedStorage).forEach(function(key) {
+    localStorage.setItem(key, parsedStorage[key]);
+  });
 }
 
 window.restoreCookies = restoreCookies;
