@@ -94,7 +94,11 @@ public class CookiePersistencePlugin extends CordovaPlugin {
             String storedLocalStorage = readFile(context, LOCALSTORAGE_FILE_PATH);
             LOG.d(LOG_TAG, "Cookie File Content: \n" + storedLocalStorage);
 
-            callbackContext.success([storedCookies, storedLocalStorage]);
+            String[] storedFiles;
+            storedFiles[0] = storedCookies;
+            storedFiles[1] = storedLocalStorage;
+
+            callbackContext.success(storedFiles);
             return true;
         }
 
