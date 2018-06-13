@@ -18,29 +18,11 @@
 }
 
 ////////////////////// STORE //////////////////////
-// - (void)storeCookiesAndLocalStorage:(CDVInvokedUrlCommand*)command
-// {
-//     NSString* cookies = [[command arguments] objectAtIndex:0];
-//     [self storeCookies: cookies];
-
-//     NSString* localStorage = [[command arguments] objectAtIndex:1];
-//     [self storeLocalStorage: localStorage];
-
-//     NSString* msg = [NSString stringWithFormat: @"cookies saved, %@; localStorage saved %@", cookies, localStorage];
-
-//     CDVPluginResult* result = [CDVPluginResult
-//                                resultWithStatus:CDVCommandStatus_OK
-//                                messageAsString:msg];
-
-//     [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
-// }
-
 - (void)storeCookies:(CDVInvokedUrlCommand*)command
 {
     NSString* cookies = [[command arguments] objectAtIndex:0];
 
-    [self overWriteTextFile: cookies
-                   fileName: @"cookies.txt"];
+    [self overwriteTextFile:cookies fileName:@"cookies.txt"];
 
     CDVPluginResult* result = [CDVPluginResult
                                resultWithStatus:CDVCommandStatus_OK
@@ -52,9 +34,8 @@
 - (void)storeLocalStorage:(CDVInvokedUrlCommand*)command
 {
     NSString* localStorage = [[command arguments] objectAtIndex:0];
-
-    [self overWriteTextFile: localStorage
-                   fileName: @"localstorage.txt"];
+    NSString* localFileName = @"localstorage.txt";
+    [self overwriteTextFile:localStorage fileName: localFileName];
 
 
     CDVPluginResult* result = [CDVPluginResult
@@ -70,7 +51,7 @@
     NSString* cookies = [self readFileByName:@"cookies.txt"];
     NSString* localStorage = [self readFileByName:@"localstorage.txt"];
 
-    NSString *files[2];
+    NSString* files[2];
     files[0] = cookies;
     files[1] = localStorage;
 
@@ -110,11 +91,17 @@
 {
     NSString* filePath = [self getFilePathByName: fileNameText];
 
+    NSError *error = nil;
     NSString *content = [[NSString alloc] initWithContentsOfFile:filePath
                                             usedEncoding:nil
-                                            error:nil];
+                                            error:&error];
 
-    return content;
+    if (content) {
+        return content;
+    } else {
+        NSLog(@"Error: %@", error);
+        return @"";
+    }
 }
 
 -(NSString *) getFilePathByName: (NSString*)fileName
@@ -129,15 +116,15 @@
     return filePath;
 }
 
--(void) overwriteTextFile:(NSString*)fileContents fileName:(NSString*)fileName
+- (void)overwriteTextFile:(NSString *)fileContents fileName:(NSString *)fileName
 {
     NSString* filePath = [self getFilePathByName: fileName];
-
+    
     [fileContents writeToFile:filePath
-                    atomically:NO
-                    encoding:NSUTF8StringEncoding
-                    error:nil];
-
+                   atomically:NO
+                     encoding:NSUTF8StringEncoding
+                        error:nil];
+    
 }
 
 @end

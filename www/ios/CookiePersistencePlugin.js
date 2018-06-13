@@ -8,10 +8,10 @@ console.log('CookiePersistencePlugin - JS - Cookies', document.cookie)
 //When this code is run, just get the cookie and place it in the window
 //But we need to notify when complete
 
-// COOKIES & LOCALSTORAGE
 function restoreCookiesAndLocalStorage(onSuccess, onError) {
+  debugger;
   console.time("restoreCookies - start");
-  fetchCookiesAndLocalStorage(function(res) {
+  fetchCookiesAndLocalStorage(function (res) {
     applyCookiesAndLocalStorageToBrowser(res);
     onSuccess(res);
   }, onError);
@@ -20,13 +20,13 @@ function restoreCookiesAndLocalStorage(onSuccess, onError) {
 function fetchCookiesAndLocalStorage(onSuccess, onError) {
   console.log('CookiePersistencePlugin - JS - restoreCookies');
 
-  var successCallback = function(res) {
+  var successCallback = function (res) {
     console.log('CookiePersistencePlugin - JS - restoreCookies successCallback called', res)
     console.timeEnd("restoreCookies - end");
     onSuccess(res);
   }
 
-  var errorCallback = function(e) {
+  var errorCallback = function (e) {
     console.log('CookiePersistencePlugin - JS - restoreCookies errorCallback called', e)
     onError(e);
   }
@@ -39,34 +39,31 @@ function applyCookiesAndLocalStorageToBrowser(res) {
   applyLocalStorageToBrowser(res[1]);
 }
 
-// COOKIES
 function restoreCookies(onSuccess, onError) {
   console.time("restoreCookies - start");
-  fetchCookies(function(cookies) {
+  fetchCookies(function (cookies) {
     refreshCookies(cookies);
     onSuccess(cookies);
   }, onError);
 }
 
-// LOCALSTORAGE
 function restoreLocalStorage(onSuccess, onError) {
   console.time("restoreCookies - start");
-  fetchLocalStorage(function(savedStorage) {
+  fetchLocalStorage(function (savedStorage) {
     refreshLocalStorage(savedStorage);
     onSuccess(savedStorage);
   }, onError);
 }
 
-// WRITE
 function writeCookies() {
   var cookies = document.cookie;
   console.log('CookiePersistencePlugin - JS - Pause', cookies);
 
-  var successCallback = function(r) {
+  var successCallback = function (r) {
     console.log('CookiePersistencePlugin - JS - Pause successCallback called', r)
   }
 
-  var errorCallback = function(e) {
+  var errorCallback = function (e) {
     console.log('CookiePersistencePlugin - JS - Pause errorCallback called', e)
   }
 
@@ -77,11 +74,11 @@ function writeLocalStorage() {
   var localStorageText = getLocalStorageAsString();
   console.log('CookiePersistencePlugin - JS - Pause', localStorageText);
 
-  var successCallback = function(r) {
+  var successCallback = function (r) {
     console.log('CookiePersistencePlugin - JS - Pause successCallback called', r)
   }
 
-  var errorCallback = function(e) {
+  var errorCallback = function (e) {
     console.log('CookiePersistencePlugin - JS - Pause errorCallback called', e)
   }
 
@@ -101,11 +98,11 @@ function getLocalStorageAsString() {
 function applyCookiesToBrowser(savedCookies) {
   if (!savedCookies || savedCookies.length < 1) return;
   savedCookies
-  .trim(' ')
-  .split(';')
-  .forEach(savedCookie =>
-    document.cookie = savedCookie
-  );
+    .trim(' ')
+    .split(';')
+    .forEach(function (savedCookie) {
+      document.cookie = savedCookie;
+    });
 }
 
 function applyLocalStorageToBrowser(savedStorage) {
@@ -114,12 +111,11 @@ function applyLocalStorageToBrowser(savedStorage) {
   var parsedStorage = {};
   try {
     parsedStorage = JSON.parse(savedStorage);
-  } catch(e) {
-    throw e;
-    // come back to this? bubble it up
+  } catch (e) {
+    console.error("cookie-persistence-plugin - applyLocalStorageToBrowser:", e);
   }
 
-  Object.keys(parsedStorage).forEach(function(key) {
+  Object.keys(parsedStorage).forEach(function (key) {
     localStorage.setItem(key, parsedStorage[key]);
   });
 }
