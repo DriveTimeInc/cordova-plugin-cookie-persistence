@@ -11,6 +11,11 @@ import org.apache.cordova.CordovaPlugin;
 import org.apache.cordova.CordovaWebView;
 import org.apache.cordova.ConfigXmlParser;
 import org.apache.cordova.LOG;
+import org.apache.cordova.CallbackContext;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import android.content.Context;
 import android.webkit.CookieManager;
@@ -20,7 +25,8 @@ public class CookiePersistencePlugin extends CordovaPlugin {
     private static final String SERVICE_NAME = "CookiePersistencePlugin";
     private static final String LOG_TAG = "CookiePersistenceCordovaPlugin";
 
-    private static final String COOKIE_FILE_PATH = "WebViewCookies.txt";
+    private static final String COOKIE_FILE_PATH = "cookies.txt";
+    private static final String LOCALSTORAGE_FILE_PATH = "localstorage.txt";
 
     private Context _context;
     private String _url;
@@ -32,7 +38,7 @@ public class CookiePersistencePlugin extends CordovaPlugin {
         _context = cordova.getActivity().getApplicationContext();
         _url = loadConfig(cordova.getActivity());
 
-        updateCookies(_context, _url);
+        _updateCookies(_context, _url);
 
         LOG.d(LOG_TAG, "initialize complete");
     }
@@ -51,7 +57,73 @@ public class CookiePersistencePlugin extends CordovaPlugin {
         }
         LOG.d(LOG_TAG, "Paused the activity.");
 
-        storeCookies(_context, _url);
+        _storeCookies(_context, _url);
+
+    }
+
+    @Override
+    public boolean execute(String action, JSONArray args, final CallbackContext callbackContext) throws JSONException {
+        LOG.d(LOG_TAG, "Execute called");
+
+        if (this._context == null) {
+            LOG.d(LOG_TAG, "Paused the activity. _context is NULL");
+            return false;
+        }
+
+        if (action.equals("storeCookies")) {
+            String cookies = args.getString(0);
+            if (overwriteFile(_context, COOKIE_FILE_PATH, cookies)) {
+                LOG.d(LOG_TAG, "storeCookies - Complete");
+            } else {
+                LOG.d(LOG_TAG, "storeCookies - Failed");
+            }
+            callbackContext.success();
+            return true;
+        }
+
+        if (action.equals("storeLocalStorage")) {
+            String localStorage = args.getString(0);
+            if (overwriteFile(_context, LOCALSTORAGE_FILE_PATH, localStorage)) {
+                LOG.d(LOG_TAG, "localStorage - Complete");
+            } else {
+                LOG.d(LOG_TAG, "localStorage - Failed");
+            }
+            callbackContext.success();
+            return true;
+        }
+
+        if (action.equals("retrieveCookiesAndLocalStorage")) {
+            String storedCookies = readFile(_context, COOKIE_FILE_PATH);
+            LOG.d(LOG_TAG, "Cookie File Content: \n" + storedCookies);
+
+            String storedLocalStorage = readFile(_context, LOCALSTORAGE_FILE_PATH);
+            LOG.d(LOG_TAG, "Cookie File Content: \n" + storedLocalStorage);
+
+            JSONArray storedFiles = null;
+            storedFiles.put(storedCookies);
+            storedFiles.put(storedLocalStorage);
+
+            callbackContext.success();
+            return true;
+        }
+
+        if (action.equals("retrieveCookies")) {
+            String storedCookies = readFile(_context, COOKIE_FILE_PATH);
+            LOG.d(LOG_TAG, "Cookie File Content: \n" + storedCookies);
+
+            callbackContext.success(storedCookies);
+            return true;
+        }
+
+        if (action.equals("retrieveLocalStorage")) {
+            String storedLocalStorage = readFile(_context, LOCALSTORAGE_FILE_PATH);
+            LOG.d(LOG_TAG, "Cookie File Content: \n" + storedLocalStorage);
+
+            callbackContext.success(storedLocalStorage);
+            return true;
+        }
+
+        return false;
     }
 
     public String loadConfig(Activity activity) {
@@ -60,7 +132,7 @@ public class CookiePersistencePlugin extends CordovaPlugin {
         return parser.getLaunchUrl();
     }
 
-    public void updateCookies(Context context, String url) {
+    public void _updateCookies(Context context, String url) {
         String storedCookies = readFile(context, COOKIE_FILE_PATH);
         LOG.d(LOG_TAG, "Cookie File Content: \n" + storedCookies);
 
@@ -71,7 +143,7 @@ public class CookiePersistencePlugin extends CordovaPlugin {
         }
     }
 
-    public void storeCookies(Context context, String url) {
+    public void _storeCookies(Context context, String url) {
         String cookies = getWebViewCookies(url);
 
         if (overwriteFile(context, COOKIE_FILE_PATH, cookies)) {
@@ -98,7 +170,7 @@ public class CookiePersistencePlugin extends CordovaPlugin {
             return CookieManager.getInstance().getCookie(url);
         } catch (Exception e) {
             LOG.e(LOG_TAG, "Exception: " + e.getMessage());
-            return null;
+            return "";
         }
     }
 
@@ -135,7 +207,7 @@ public class CookiePersistencePlugin extends CordovaPlugin {
         } catch (Exception e) {
             e.printStackTrace();
             LOG.d(LOG_TAG,"ERROR" + e.getMessage());
-            return null;
+            return "";
         }
     }
 }

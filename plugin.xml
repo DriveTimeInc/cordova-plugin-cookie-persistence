@@ -32,6 +32,10 @@
         <source-file src="src/android/CookiePersistencePlugin.java"
                      target-dir="src/com/drivetime/mobile/cordova" />
 
+        <js-module src="www/CookiePersistencePlugin.js"
+                   name="CookiePersistence">
+            <runs/>
+        </js-module>
     </platform>
 
     <platform name="ios">
@@ -45,7 +49,7 @@
         <header-file src="src/ios/CookiePersistencePlugin.h" />
         <source-file src="src/ios/CookiePersistencePlugin.m" />
 
-        <js-module src="www/ios/CookiePersistencePlugin.js"
+        <js-module src="www/CookiePersistencePlugin.js"
                    name="CookiePersistence">
             <runs/>
         </js-module>

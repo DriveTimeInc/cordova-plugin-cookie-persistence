@@ -17,81 +17,114 @@
     NSLog(@"CookiePersistencePlugin - OC - Initialized");
 }
 
+////////////////////// STORE //////////////////////
 - (void)storeCookies:(CDVInvokedUrlCommand*)command
 {
     NSString* cookies = [[command arguments] objectAtIndex:0];
 
-    NSLog(@"CookiePersistencePlugin - OC - storeCookies - %@", cookies);
-
-    [self overwriteFile: cookies];
-
-    NSString* msg = [NSString stringWithFormat: @"Cookies Stored, %@", cookies];
+    [self overwriteTextFile:cookies fileName:@"cookies.txt"];
 
     CDVPluginResult* result = [CDVPluginResult
                                resultWithStatus:CDVCommandStatus_OK
-                               messageAsString:msg];
+                               messageAsString:@"cookies saved to disk"];
+
+    [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
+}
+
+- (void)storeLocalStorage:(CDVInvokedUrlCommand*)command
+{
+    NSString* localStorage = [[command arguments] objectAtIndex:0];
+    NSString* localFileName = @"localstorage.txt";
+    [self overwriteTextFile:localStorage fileName: localFileName];
+
+
+    CDVPluginResult* result = [CDVPluginResult
+                               resultWithStatus:CDVCommandStatus_OK
+                               messageAsString:@"localStorage saved to disk"];
+
+    [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
+}
+
+////////////////////// RETRIEVE //////////////////////
+- (void)retrieveCookiesAndLocalStorage:(CDVInvokedUrlCommand*)command
+{
+    NSString* cookies = [self readFileByName:@"cookies.txt"];
+    NSString* localStorage = [self readFileByName:@"localstorage.txt"];
+
+    NSString* files[2];
+    files[0] = cookies;
+    files[1] = localStorage;
+
+    NSArray *res = [NSArray arrayWithObjects:files count:2];
+
+    CDVPluginResult* result = [CDVPluginResult
+                               resultWithStatus:CDVCommandStatus_OK
+                               messageAsArray:res];
 
     [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
 }
 
 - (void)retrieveCookies:(CDVInvokedUrlCommand*)command
 {
-    [self readFile];
-
-    NSString* cookies = [self readFile];
-
-    NSLog(@"CookiePersistencePlugin - OC - retrieveCookies - %@", cookies);
+    NSString* file = [self readFileByName:@"cookies.txt"];
 
     CDVPluginResult* result = [CDVPluginResult
                                resultWithStatus:CDVCommandStatus_OK
-                               messageAsString:cookies];
+                               messageAsString:file];
 
     [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
 }
 
--(void) overwriteFile:(NSString*)fileContents
+- (void)retrieveLocalStorage:(CDVInvokedUrlCommand*)command
 {
-    NSString *fileName = [self getFileName];
+    NSString* file = [self readFileByName:@"localstorage.txt"];
 
-    [fileContents writeToFile:fileName
-                    atomically:NO
-                    encoding:NSUTF8StringEncoding
-                    error:nil];
+    CDVPluginResult* result = [CDVPluginResult
+                               resultWithStatus:CDVCommandStatus_OK
+                               messageAsString:file];
 
+    [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
 }
 
--(NSString *) readFile
+////////////////////// UTILS //////////////////////
+-(NSString *) readFileByName:(NSString*)fileNameText
 {
-    NSString *fileName = [self getFileName];
-    NSString *content = [[NSString alloc] initWithContentsOfFile:fileName
+    NSString* filePath = [self getFilePathByName: fileNameText];
+
+    NSError *error = nil;
+    NSString *content = [[NSString alloc] initWithContentsOfFile:filePath
                                             usedEncoding:nil
-                                            error:nil];
+                                            error:&error];
 
-    NSLog(@"CONTENT:%@",content);
-
-    return content;
+    if (content) {
+        return content;
+    } else {
+        NSLog(@"Error: %@", error);
+        return @"";
+    }
 }
 
--(NSString *) getFileName
+-(NSString *) getFilePathByName: (NSString*)fileName
 {
     NSArray *paths = NSSearchPathForDirectoriesInDomains
                     (NSDocumentDirectory, NSUserDomainMask, YES);
     NSString *documentsDirectory = [paths objectAtIndex:0];
 
-    NSString *fileName = [NSString stringWithFormat:@"%@/cookies.txt",
-                                                    documentsDirectory];
+    NSString *filePath = [NSString stringWithFormat:@"%@\/%@",
+                             documentsDirectory, fileName];
 
-    return fileName;
+    return filePath;
 }
 
--(void) displayCookies:(NSString*)content
+- (void)overwriteTextFile:(NSString *)fileContents fileName:(NSString *)fileName
 {
-    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Cookies"
-                                                    message:content
-                                                   delegate:nil
-                                          cancelButtonTitle:@"OK"
-                                          otherButtonTitles:nil];
-    [alert show];
+    NSString* filePath = [self getFilePathByName: fileName];
+    
+    [fileContents writeToFile:filePath
+                   atomically:NO
+                     encoding:NSUTF8StringEncoding
+                        error:nil];
+    
 }
 
 @end
