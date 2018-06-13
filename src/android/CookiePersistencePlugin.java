@@ -11,6 +11,11 @@ import org.apache.cordova.CordovaPlugin;
 import org.apache.cordova.CordovaWebView;
 import org.apache.cordova.ConfigXmlParser;
 import org.apache.cordova.LOG;
+import org.apache.cordova.CallbackContext;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import android.content.Context;
 import android.webkit.CookieManager;
@@ -88,22 +93,22 @@ public class CookiePersistencePlugin extends CordovaPlugin {
         }
 
         if (action.equals("retrieveCookiesAndLocalStorage")) {
-            String storedCookies = readFile(context, COOKIE_FILE_PATH);
+            String storedCookies = readFile(_context, COOKIE_FILE_PATH);
             LOG.d(LOG_TAG, "Cookie File Content: \n" + storedCookies);
 
-            String storedLocalStorage = readFile(context, LOCALSTORAGE_FILE_PATH);
+            String storedLocalStorage = readFile(_context, LOCALSTORAGE_FILE_PATH);
             LOG.d(LOG_TAG, "Cookie File Content: \n" + storedLocalStorage);
 
-            String[] storedFiles;
-            storedFiles[0] = storedCookies;
-            storedFiles[1] = storedLocalStorage;
+            JSONArray storedFiles = null;
+            storedFiles.put(storedCookies);
+            storedFiles.put(storedLocalStorage);
 
-            callbackContext.success(storedFiles);
+            callbackContext.success();
             return true;
         }
 
         if (action.equals("retrieveCookies")) {
-            String storedCookies = readFile(context, COOKIE_FILE_PATH);
+            String storedCookies = readFile(_context, COOKIE_FILE_PATH);
             LOG.d(LOG_TAG, "Cookie File Content: \n" + storedCookies);
 
             callbackContext.success(storedCookies);
@@ -111,7 +116,7 @@ public class CookiePersistencePlugin extends CordovaPlugin {
         }
 
         if (action.equals("retrieveLocalStorage")) {
-            String storedLocalStorage = readFile(context, LOCALSTORAGE_FILE_PATH);
+            String storedLocalStorage = readFile(_context, LOCALSTORAGE_FILE_PATH);
             LOG.d(LOG_TAG, "Cookie File Content: \n" + storedLocalStorage);
 
             callbackContext.success(storedLocalStorage);
