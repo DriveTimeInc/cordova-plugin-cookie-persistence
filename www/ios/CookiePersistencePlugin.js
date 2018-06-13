@@ -9,7 +9,6 @@ console.log('CookiePersistencePlugin - JS - Cookies', document.cookie)
 //But we need to notify when complete
 
 function restoreCookiesAndLocalStorage(onSuccess, onError) {
-  debugger;
   console.time("restoreCookies - start");
   fetchCookiesAndLocalStorage(function (res) {
     applyCookiesAndLocalStorageToBrowser(res);
