@@ -16,23 +16,6 @@ function restoreCookiesAndLocalStorage(onSuccess, onError) {
   }, onError);
 }
 
-function fetchCookiesAndLocalStorage(onSuccess, onError) {
-  console.log('CookiePersistencePlugin - JS - restoreCookies');
-
-  var successCallback = function (res) {
-    console.log('CookiePersistencePlugin - JS - restoreCookies successCallback called', res)
-    console.timeEnd("restoreCookies - end");
-    onSuccess(res);
-  }
-
-  var errorCallback = function (e) {
-    console.log('CookiePersistencePlugin - JS - restoreCookies errorCallback called', e)
-    onError(e);
-  }
-
-  cordova.exec(successCallback, errorCallback, "CookiePersistence", "retrieveCookiesAndLocalStorage", []);
-}
-
 function applyCookiesAndLocalStorageToBrowser(res) {
   applyCookiesToBrowser(res[0]);
   applyLocalStorageToBrowser(res[1]);
@@ -47,11 +30,50 @@ function restoreCookies(onSuccess, onError) {
 }
 
 function restoreLocalStorage(onSuccess, onError) {
-  console.time("restoreCookies - start");
+  console.time("restoreLocalStorage - start");
   fetchLocalStorage(function (savedStorage) {
     refreshLocalStorage(savedStorage);
     onSuccess(savedStorage);
   }, onError);
+}
+
+function fetchCookiesAndLocalStorage(onSuccess, onError) {
+  console.log('CookiePersistencePlugin - JS - retrieveCookiesAndLocalStorage');
+
+  cordova.exec(function (res) {
+    console.log('CookiePersistencePlugin - JS - retrieveCookiesAndLocalStorage successCallback called', res)
+    console.timeEnd("retrieveCookiesAndLocalStorage - end");
+    onSuccess(res);
+  }, function (e) {
+    console.log('CookiePersistencePlugin - JS - retrieveCookiesAndLocalStorage errorCallback called', e)
+    onError(e);
+  }, "CookiePersistence", "retrieveCookiesAndLocalStorage", []);
+}
+
+function fetchCookies(onSuccess, onError) {
+  console.log('CookiePersistencePlugin - JS - restoreCookies');
+
+  cordova.exec(function (res) {
+    console.log('CookiePersistencePlugin - JS - restoreCookies successCallback called', res)
+    console.timeEnd("restoreCookies - end");
+    onSuccess(res);
+  }, function (e) {
+    console.log('CookiePersistencePlugin - JS - restoreCookies errorCallback called', e)
+    onError(e);
+  }, "CookiePersistence", "retrieveCookies", []);
+}
+
+function fetchLocalStorage(onSuccess, onError) {
+  console.log('CookiePersistencePlugin - JS - retrieveLocalStorage');
+
+  cordova.exec(function (res) {
+    console.log('CookiePersistencePlugin - JS - retrieveLocalStorage successCallback called', res)
+    console.timeEnd("retrieveLocalStorage - end");
+    onSuccess(res);
+  }, function (e) {
+    console.log('CookiePersistencePlugin - JS - retrieveLocalStorage errorCallback called', e)
+    onError(e);
+  }, "CookiePersistence", "retrieveLocalStorage", []);
 }
 
 function writeCookies() {
