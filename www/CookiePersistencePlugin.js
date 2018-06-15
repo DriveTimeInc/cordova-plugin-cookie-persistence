@@ -11,20 +11,16 @@ console.log('CookiePersistencePlugin - JS - Cookies', document.cookie)
 function restoreCookiesAndLocalStorage(onSuccess, onError) {
   console.time("restoreCookies - start");
   fetchCookiesAndLocalStorage(function (res) {
-    applyCookiesAndLocalStorageToBrowser(res);
+    applyCookiesToBrowser(res[0]);
+    applyLocalStorageToBrowser(res[1]);
     onSuccess(res);
   }, onError);
-}
-
-function applyCookiesAndLocalStorageToBrowser(res) {
-  applyCookiesToBrowser(res[0]);
-  applyLocalStorageToBrowser(res[1]);
 }
 
 function restoreCookies(onSuccess, onError) {
   console.time("restoreCookies - start");
   fetchCookies(function (cookies) {
-    refreshCookies(cookies);
+    applyCookiesToBrowser(cookies);
     onSuccess(cookies);
   }, onError);
 }
@@ -32,7 +28,7 @@ function restoreCookies(onSuccess, onError) {
 function restoreLocalStorage(onSuccess, onError) {
   console.time("restoreLocalStorage - start");
   fetchLocalStorage(function (savedStorage) {
-    refreshLocalStorage(savedStorage);
+    applyLocalStorageToBrowser(savedStorage);
     onSuccess(savedStorage);
   }, onError);
 }
