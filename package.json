@@ -8,5 +8,10 @@
   },
   "license": "MIT",
   "name": "cordova-plugin-cookie-persistence",
-  "version": "0.0.1"
+  "version": "0.0.1",
+  "dependencies": {
+    "cordova-js": "^4.2.2",
+    "fluture": "^8.0.2",
+    "sanctuary": "^0.15.0"
+  }
 }
