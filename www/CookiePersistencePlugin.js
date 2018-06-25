@@ -88,9 +88,6 @@ function writeCookies() {
 }
 
 function writeLocalStorage() {
-  var localStorageText = getLocalStorageAsString();
-  console.log('CookiePersistencePlugin - JS - Pause', localStorageText);
-
   var successCallback = function (r) {
     console.log('CookiePersistencePlugin - JS - Pause successCallback called', r)
   }
@@ -99,17 +96,30 @@ function writeLocalStorage() {
     console.log('CookiePersistencePlugin - JS - Pause errorCallback called', e)
   }
 
-  cordova.exec(successCallback, errorCallback, "CookiePersistence", "storeLocalStorage", [localStorageText]);
+  getLocalStorageAsString(function (localStorageText) {
+    console.log('CookiePersistencePlugin - JS - Pause', localStorageText);
+    cordova.exec(successCallback, errorCallback, "CookiePersistence", "storeLocalStorage", [localStorageText]);
+  }, errorCallback)
 }
 
 // UTILS
-function getLocalStorageAsString() {
+function getLocalStorageAsString(onSuccess, onError) {
   var localStorageObj = {}
-  for (var i = 0; i < localStorage.length; i++) {
-    localStorageObj[localStorage.key(i)] = localStorage.getItem(localStorage.key(i));
+
+  try {
+    for (var i = 0; i < localStorage.length; i++) {
+      var k = localStorage.key(i);
+      var v = localStorage.getItem(k);
+      localStorageObj[k] = v;
+    }
+  } catch (e) {
+    // it is possible that accessing localstorage could fail. If it does, we don't want the problem to cascade.
+    var err = "cookie-persistence-plugin - failed to getLocalStorageAsString. localstorage may not be available. ";
+    console.error(err, e);
+    onError(err + e.toString());
   }
 
-  return JSON.stringify(localStorageObj);
+  onSuccess(JSON.stringify(localStorageObj));
 }
 
 function applyCookiesToBrowser(savedCookies) {
